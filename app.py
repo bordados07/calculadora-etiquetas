@@ -7,11 +7,11 @@ st.set_page_config(
     layout="centered"
 )
 
-st.title("📦 Calculadora de Etiquetas")
+st.title("📦 Calculadora Mensual de Etiquetas")
 
-# ==========================
+# ==================================
 # MATERIALES
-# ==========================
+# ==================================
 
 materiales = {
     "Transferencia Directa": {
@@ -21,16 +21,9 @@ materiales = {
     }
 }
 
-material_seleccionado = st.selectbox(
-    "Selecciona el material",
-    list(materiales.keys())
-)
-
-material = materiales[material_seleccionado]
-
-# ==========================
+# ==================================
 # ETIQUETAS
-# ==========================
+# ==================================
 
 etiquetas = {
     "102x51": {
@@ -40,30 +33,11 @@ etiquetas = {
     }
 }
 
-etiqueta_seleccionada = st.selectbox(
-    "Selecciona la etiqueta",
-    list(etiquetas.keys())
-)
+# ==================================
+# CONFIGURACIÓN GENERAL
+# ==================================
 
-etiqueta = etiquetas[etiqueta_seleccionada]
-
-# ==========================
-# VENTAS
-# ==========================
-
-st.subheader("💰 Datos de Venta")
-
-millares = st.number_input(
-    "Millares vendidos",
-    min_value=0.0,
-    value=670.0
-)
-
-facturacion = st.number_input(
-    "Facturación total (MXN)",
-    min_value=0.0,
-    value=970000.0
-)
+st.subheader("⚙️ Configuración")
 
 tipo_cambio = st.number_input(
     "Tipo de cambio (MXN por USD)",
@@ -71,11 +45,62 @@ tipo_cambio = st.number_input(
     value=19.0
 )
 
-# ==========================
-# CALCULO
-# ==========================
+cantidad_pedidos = st.number_input(
+    "Cantidad de pedidos",
+    min_value=1,
+    value=1,
+    step=1
+)
 
-if st.button("📊 Calcular"):
+# ==================================
+# ACUMULADORES
+# ==================================
+
+total_etiquetas = 0
+total_facturacion = 0
+total_area = 0
+total_rollos = 0
+total_costo_usd = 0
+
+# ==================================
+# PEDIDOS
+# ==================================
+
+for i in range(int(cantidad_pedidos)):
+
+    st.markdown("---")
+    st.subheader(f"📋 Pedido {i+1}")
+
+    material_seleccionado = st.selectbox(
+        "Material",
+        list(materiales.keys()),
+        key=f"mat_{i}"
+    )
+
+    etiqueta_seleccionada = st.selectbox(
+        "Etiqueta",
+        list(etiquetas.keys()),
+        key=f"eti_{i}"
+    )
+
+    millares = st.number_input(
+        "Millares vendidos",
+        min_value=0.0,
+        value=0.0,
+        key=f"mil_{i}"
+    )
+
+    facturacion = st.number_input(
+        "Facturación (MXN)",
+        min_value=0.0,
+        value=0.0,
+        key=f"fac_{i}"
+    )
+
+    material = materiales[material_seleccionado]
+    etiqueta = etiquetas[etiqueta_seleccionada]
+
+    etiquetas_vendidas = millares * 1000
 
     ancho_material = material["ancho"]
     largo_material = material["largo"]
@@ -84,8 +109,6 @@ if st.button("📊 Calcular"):
     ancho_etiqueta = etiqueta["ancho"]
     largo_etiqueta = etiqueta["largo"]
     separacion = etiqueta["separacion"]
-
-    etiquetas_vendidas = millares * 1000
 
     ancho_material_mm = ancho_material * 10
 
@@ -102,11 +125,14 @@ if st.button("📊 Calcular"):
         largo_material_mm / avance
     )
 
-    etiquetas_por_rollo = etiquetas_por_fila * filas
+    etiquetas_por_rollo = (
+        etiquetas_por_fila * filas
+    )
 
     rollos_utilizados = (
         etiquetas_vendidas /
         etiquetas_por_rollo
+        if etiquetas_por_rollo > 0 else 0
     )
 
     area_rollo = (
@@ -123,44 +149,46 @@ if st.button("📊 Calcular"):
         precio_m2
     )
 
-    costo_mxn = (
-        costo_usd *
-        tipo_cambio
-    )
+    total_etiquetas += etiquetas_vendidas
+    total_facturacion += facturacion
+    total_area += area_consumida
+    total_rollos += rollos_utilizados
+    total_costo_usd += costo_usd
+
+# ==================================
+# RESULTADO FINAL
+# ==================================
+
+if st.button("📊 Calcular Mes"):
+
+    costo_mxn = total_costo_usd * tipo_cambio
 
     utilidad = (
-        facturacion -
+        total_facturacion -
         costo_mxn
     )
 
-    st.success("✅ Resultados")
+    st.markdown("---")
+    st.header("📈 Resultado Mensual")
 
     st.write(
-        f"📦 Material: {material_seleccionado}"
+        f"📋 Total de pedidos: {cantidad_pedidos}"
     )
 
     st.write(
-        f"🏷️ Etiqueta: {etiqueta_seleccionada}"
+        f"🏷️ Total etiquetas vendidas: {total_etiquetas:,.0f}"
     )
 
     st.write(
-        f"🏷️ Etiquetas vendidas: {etiquetas_vendidas:,.0f}"
+        f"📦 Rollos utilizados: {total_rollos:.2f}"
     )
 
     st.write(
-        f"📦 Etiquetas por rollo: {etiquetas_por_rollo:,.0f}"
+        f"📐 Área consumida: {total_area:,.2f} m²"
     )
 
     st.write(
-        f"📦 Rollos utilizados: {rollos_utilizados:.2f}"
-    )
-
-    st.write(
-        f"📐 Área consumida: {area_consumida:,.2f} m²"
-    )
-
-    st.write(
-        f"💵 Costo material USD: ${costo_usd:,.2f}"
+        f"💵 Costo material USD: ${total_costo_usd:,.2f}"
     )
 
     st.write(
@@ -168,7 +196,7 @@ if st.button("📊 Calcular"):
     )
 
     st.write(
-        f"🧾 Facturación: ${facturacion:,.2f}"
+        f"🧾 Facturación total: ${total_facturacion:,.2f}"
     )
 
     st.write(
