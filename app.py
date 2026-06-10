@@ -89,7 +89,8 @@ etiquetas_por_tipo = {
 tipo_cambio = st.number_input("Tipo de cambio (MXN por USD)", min_value=0.01, value=19.0, format="%.6f")
 cantidad_pedidos = st.number_input("Cantidad de pedidos", min_value=1, value=1, step=1)
 
-total_etiquetas = total_facturacion = total_area = total_rollos = total_costo_usd = 0
+total_etiquetas = total_area = total_rollos = total_costo_usd = 0
+total_facturacion_usd = 0
 
 for i in range(int(cantidad_pedidos)):
     st.markdown("---")
@@ -100,15 +101,18 @@ for i in range(int(cantidad_pedidos)):
     medida = st.selectbox("Medida", list(etiquetas_por_tipo[tipo].keys()), key=f"e{i}")
 
     millares = st.number_input("Millares vendidos", min_value=0.0, value=0.0, format="%.6f", key=f"mil{i}")
-    facturacion = st.number_input("Facturación (MXN)", min_value=0.0, value=0.0, format="%.6f", key=f"fac{i}")
+    precio_millar = st.number_input("Precio por millar (USD)", min_value=0.0, value=0.0, format="%.8f", key=f"pre{i}")
 
     material = materiales[material_sel]
     etiqueta = etiquetas_por_tipo[tipo][medida]
 
+    facturacion_usd = millares * precio_millar
+    total_facturacion_usd += facturacion_usd
+
     etiquetas_vendidas = millares * 1000
     ancho_material_mm = material["ancho"] * 10
     etiquetas_por_fila = max(1, math.floor(ancho_material_mm / etiqueta["ancho"]))
-    avance = etiqueta["largo"] + 4
+    avance = etiqueta["largo"] + 2
     largo_material_mm = material["largo"] * 1000
     filas = math.floor(largo_material_mm / avance)
     etiquetas_por_rollo = max(1, etiquetas_por_fila * filas)
@@ -119,21 +123,22 @@ for i in range(int(cantidad_pedidos)):
     costo_usd = area_consumida * material["precio"]
 
     total_etiquetas += etiquetas_vendidas
-    total_facturacion += facturacion
     total_area += area_consumida
     total_rollos += rollos
     total_costo_usd += costo_usd
 
 if st.button("📊 Calcular Mes"):
     costo_mxn = total_costo_usd * tipo_cambio
-    utilidad = total_facturacion - costo_mxn
+    facturacion_mxn = total_facturacion_usd * tipo_cambio
+    utilidad = facturacion_mxn - costo_mxn
 
     st.header("📈 Resultado Mensual")
     st.write(f"📋 Total de pedidos: {cantidad_pedidos}")
     st.write(f"🏷️ Total etiquetas vendidas: {total_etiquetas:,.0f}")
     st.write(f"📦 Rollos utilizados: {total_rollos:.8f}")
-    st.write(f"📐 Área consumida: {total_area:,.8f} m²")
-    st.write(f"💵 Costo material USD: ${total_costo_usd:,.8f}")
-    st.write(f"💰 Costo material MXN: ${costo_mxn:,.8f}")
-    st.write(f"🧾 Facturación total: ${total_facturacion:,.8f}")
-    st.write(f"📈 Ganancia neta: ${utilidad:,.8f}")
+    st.write(f"📐 Área consumida: {total_area:.8f} m²")
+    st.write(f"💵 Costo material USD: ${total_costo_usd:.8f}")
+    st.write(f"💰 Costo material MXN: ${costo_mxn:.8f}")
+    st.write(f"🧾 Facturación USD: ${total_facturacion_usd:.8f}")
+    st.write(f"🧾 Facturación MXN: ${facturacion_mxn:.8f}")
+    st.write(f"📈 Ganancia neta MXN: ${utilidad:.8f}")
