@@ -112,7 +112,7 @@ for i in range(int(cantidad_pedidos)):
     etiquetas_vendidas = millares * 1000
     ancho_material_mm = material["ancho"] * 10
     etiquetas_por_fila = max(1, math.floor(ancho_material_mm / etiqueta["ancho"]))
-    avance = etiqueta["largo"] + 3.175
+    avance = etiqueta["largo"] + 3
     largo_material_mm = material["largo"] * 1000
     filas = math.floor(largo_material_mm / avance)
     etiquetas_por_rollo = max(1, etiquetas_por_fila * filas)
