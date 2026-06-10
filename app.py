@@ -108,7 +108,7 @@ for i in range(int(cantidad_pedidos)):
     etiquetas_vendidas = millares * 1000
     ancho_material_mm = material["ancho"] * 10
     etiquetas_por_fila = max(1, math.floor(ancho_material_mm / etiqueta["ancho"]))
-    avance = etiqueta["largo"] + 4
+    avance = etiqueta["largo"] + 2
     largo_material_mm = material["largo"] * 1000
     filas = math.floor(largo_material_mm / avance)
     etiquetas_por_rollo = max(1, etiquetas_por_fila * filas)
@@ -131,9 +131,9 @@ if st.button("📊 Calcular Mes"):
     st.header("📈 Resultado Mensual")
     st.write(f"📋 Total de pedidos: {cantidad_pedidos}")
     st.write(f"🏷️ Total etiquetas vendidas: {total_etiquetas:,.0f}")
-    st.write(f"📦 Rollos utilizados: {total_rollos:.2f}")
-    st.write(f"📐 Área consumida: {total_area:,.2f} m²")
-    st.write(f"💵 Costo material USD: ${total_costo_usd:,.2f}")
-    st.write(f"💰 Costo material MXN: ${costo_mxn:,.2f}")
-    st.write(f"🧾 Facturación total: ${total_facturacion:,.2f}")
-    st.write(f"📈 Ganancia neta: ${utilidad:,.2f}")
+    st.write(f"📦 Rollos utilizados: {total_rollos:.6f}")
+    st.write(f"📐 Área consumida: {total_area:.6f} m²")
+    st.write(f"💵 Costo material USD: ${total_costo_usd:.6f}")
+    st.write(f"💰 Costo material MXN: ${costo_mxn:.6f}")
+    st.write(f"🧾 Facturación total: ${total_facturacion:.6f}")
+    st.write(f"📈 Ganancia neta: ${utilidad:.6f}")
