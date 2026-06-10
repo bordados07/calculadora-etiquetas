@@ -86,7 +86,7 @@ etiquetas_por_tipo = {
     }
 }
 
-tipo_cambio = st.number_input("Tipo de cambio (MXN por USD)", min_value=0.01, value=19.0)
+tipo_cambio = st.number_input("Tipo de cambio (MXN por USD)", min_value=0.01, value=19.0, format="%.6f")
 cantidad_pedidos = st.number_input("Cantidad de pedidos", min_value=1, value=1, step=1)
 
 total_etiquetas = total_facturacion = total_area = total_rollos = total_costo_usd = 0
@@ -99,8 +99,8 @@ for i in range(int(cantidad_pedidos)):
     tipo = st.selectbox("Tipo de etiqueta", list(etiquetas_por_tipo.keys()), key=f"t{i}")
     medida = st.selectbox("Medida", list(etiquetas_por_tipo[tipo].keys()), key=f"e{i}")
 
-    millares = st.number_input("Millares vendidos", min_value=0.0, value=0.0, key=f"mil{i}")
-    facturacion = st.number_input("Facturación (MXN)", min_value=0.0, value=0.0, key=f"fac{i}")
+    millares = st.number_input("Millares vendidos", min_value=0.0, value=0.0, format="%.6f", key=f"mil{i}")
+    facturacion = st.number_input("Facturación (MXN)", min_value=0.0, value=0.0, format="%.6f", key=f"fac{i}")
 
     material = materiales[material_sel]
     etiqueta = etiquetas_por_tipo[tipo][medida]
@@ -108,7 +108,7 @@ for i in range(int(cantidad_pedidos)):
     etiquetas_vendidas = millares * 1000
     ancho_material_mm = material["ancho"] * 10
     etiquetas_por_fila = max(1, math.floor(ancho_material_mm / etiqueta["ancho"]))
-    avance = etiqueta["largo"] + 2
+    avance = etiqueta["largo"] + 4
     largo_material_mm = material["largo"] * 1000
     filas = math.floor(largo_material_mm / avance)
     etiquetas_por_rollo = max(1, etiquetas_por_fila * filas)
@@ -131,9 +131,9 @@ if st.button("📊 Calcular Mes"):
     st.header("📈 Resultado Mensual")
     st.write(f"📋 Total de pedidos: {cantidad_pedidos}")
     st.write(f"🏷️ Total etiquetas vendidas: {total_etiquetas:,.0f}")
-    st.write(f"📦 Rollos utilizados: {total_rollos:.6f}")
-    st.write(f"📐 Área consumida: {total_area:.6f} m²")
-    st.write(f"💵 Costo material USD: ${total_costo_usd:.6f}")
-    st.write(f"💰 Costo material MXN: ${costo_mxn:.6f}")
-    st.write(f"🧾 Facturación total: ${total_facturacion:.6f}")
-    st.write(f"📈 Ganancia neta: ${utilidad:.6f}")
+    st.write(f"📦 Rollos utilizados: {total_rollos:.2f}")
+    st.write(f"📐 Área consumida: {total_area:,.2f} m²")
+    st.write(f"💵 Costo material USD: ${total_costo_usd:,.2f}")
+    st.write(f"💰 Costo material MXN: ${costo_mxn:,.2f}")
+    st.write(f"🧾 Facturación total: ${total_facturacion:,.2f}")
+    st.write(f"📈 Ganancia neta: ${utilidad:,.2f}")
